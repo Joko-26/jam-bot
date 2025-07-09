@@ -23,7 +23,7 @@ client.once("ready", () => {
   console.log("Discord bot is ready");
 
   setInterval(async () => {
-    const channelId = "1392143552011829278";
+    const channelId = config.DISCORD_JAM_CHANNEL_ID;
     const channel = client.channels.cache.get(channelId) as TextChannel;
     const currentStage = state.jamStage;
     if (currentStage == "voting") {
