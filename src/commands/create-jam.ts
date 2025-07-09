@@ -2,20 +2,36 @@ import {
   CommandInteraction,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
 } from "discord.js";
 import { state } from "../state";
+import { timeSplitter } from "../timeSplitter"
+import { loadString } from "../saveString";
 
 export const data = new SlashCommandBuilder()
   .setName("createjam")
   .setDescription("Create a Jam")
 
-  .addIntegerOption((option) =>
-    option.setName("endday").setDescription("End day (1-31)").setRequired(true)
-  )
-  .addIntegerOption((option) =>
+  .addStringOption((option) => 
     option
-      .setName("endhour")
-      .setDescription("End hour (0-23)")
+      .setName("votingenddate")
+      .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
+      .setRequired(true)
+  )
+  .addStringOption((option) => 
+    option
+      .setName("jamstartdate")
+      .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
+      .setRequired(true)
+  )
+
+  .addStringOption((option) => 
+    option
+      .setName("jamenddate")
+      .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
       .setRequired(true)
   )
 
@@ -25,63 +41,57 @@ export const data = new SlashCommandBuilder()
       .setDescription("The official page of the Jam")
       .setRequired(false)
   )
-  .addStringOption((option) =>
-    option
-      .setName("theme")
-      .setDescription("The theme of the Jam if left empty the last voted theme will be choosen")
-      .setRequired(false)
-    );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const requiredRoleName = "Jam-Admin";
-  const member = interaction.member;
 
-  const hasRole = member.roles.cache.some(
-    (role) => role.name === requiredRoleName
-  );
-
-  if (!hasRole) {
-    return interaction.reply("You dont have permission to run this command");
+  const member = interaction.member as GuildMember;
+  if (!member.roles.cache.some((role) => role.name === requiredRoleName)) {
+    return interaction.reply({
+      content: "You don't have permission to run this command.",
+      ephemeral: true,
+    });
   }
 
-  let theme = ""
-
-
-  theme = interaction.options.getString("theme");
-  const day = interaction.options.getInteger("endday", true);
-  const hour = interaction.options.getInteger("endhour", true);
+  const votingEnd = interaction.options.getString("votingenddate", true);
+  const jamStart = interaction.options.getString("jamstartdate", true);
+  const jamEnd = interaction.options.getString("jamenddate", true);
   const jampage = interaction.options.getString("jampage") ?? "";
 
-  if(!theme) {
-    theme = state.votedTheme
-  }
+  state.votingEndTime = timeSplitter(votingEnd)
+  state.jamStartTime = timeSplitter(jamStart)
+  state.jamEndTime = timeSplitter(jamEnd)
 
-  const now = new Date();
-  let month = now.getMonth(); // 0-basiert
-  const year = now.getFullYear();
+  state.jamStage = "voting"
 
-  const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
-  if (day > daysInCurrentMonth) {
-    month += 1;
-    if (month > 11) {
-      month = 0;
-    }
-  } else if (day < now.getDate()) {
-    month += 1;
-    if (month > 11) {
-      month = 0;
-    }
-  }
-
-  const endTime = new Date(year, month, day, hour).getTime();
-
-  state.currentTheme = theme;
-  state.endTime = endTime;
   state.jamPage = jampage;
 
-  await interaction.reply(
-    `Jam erstellt!\nTheme: ${theme}\nEnde: ${day}.${
-      month + 1
-    }.${year} ${hour}\n${jampage ? "Jam Page: " + jampage : ""}`
+  const themes = loadString();
+  if (!themes) {
+    return interaction.reply("No themes available.");
+  }
+
+  const themesArr = Object.values(themes);
+  const shuffled = [...themesArr].sort(() => Math.random() - 0.5);
+  const selectedThemes = shuffled.slice(0, 3);
+
+  const buttons = selectedThemes.map((theme, i) =>
+    new ButtonBuilder()
+      .setCustomId(`theme_vote_${theme}`)
+      .setLabel(theme)
+      .setStyle(ButtonStyle.Primary)
+
   );
+
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
+
+  const embed = new EmbedBuilder()
+    .setTitle("Vote for a Theme")
+    .setDescription(`The Vote ends at **${state.votingEndTime}**`)
+    .setColor(0x00ff88)
+
+  await interaction.reply({
+    embeds: [embed],
+    components: [row],
+  });
 }

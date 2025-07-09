@@ -6,5 +6,8 @@ export const data = new SlashCommandBuilder()
   .setDescription("shows the current jam theme");
 
 export async function execute(interaction: CommandInteraction) {
-    await interaction.reply(`The current jam theme is ${state.currentTheme}`)
+    await interaction.reply({
+      content: `The current jam theme is ${state.currentTheme}`,
+      flags: "Ephemeral"
+    })
 }

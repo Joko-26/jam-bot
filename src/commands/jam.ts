@@ -1,40 +1,45 @@
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import { state } from "../state";
+import { timeSplitter, getTimeUntil } from "../timeSplitter";
 
 export const data = new SlashCommandBuilder()
   .setName("jam")
   .setDescription("shows the current Jam");
 
 export async function execute(interaction: CommandInteraction) {
-  const now = Date.now();
-  let timeLeft = state.endTime - now;
-
-  // Negative Zeit für vergangene Jams
-  const isPast = timeLeft <= 0;
-  if (isPast) timeLeft = Math.abs(timeLeft);
-
-  const seconds = Math.floor((timeLeft / 1000) % 60);
-  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
-  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
-  const days = Math.floor((timeLeft / (1000 * 60 * 60 * 24)) % 30.44);
-  const months = Math.floor((timeLeft / (1000 * 60 * 60 * 24 * 30.44)) % 12);
-  const years = Math.floor(timeLeft / (1000 * 60 * 60 * 24 * 365.25));
-
-  const timeString =
-    (years ? `${years}y ` : "") +
-    (months ? `${months}mo ` : "") +
-    (days ? `${days}d ` : "") +
-    (hours ? `${hours}h ` : "") +
-    (minutes ? `${minutes}m ` : "") +
-    `${seconds}s`;
-
-  if (isPast) {
-    return interaction.reply(
-      `The last Jam has ended ${timeString} ago and the theme was ${state.currentTheme}`
-    );
-  }
-
-  return interaction.reply(
-    `The current Jam ends in ${timeString}\nThe theme is ${state.currentTheme}\n`
-  );
+    if (state.jamStage == "") {
+        interaction.reply({
+            content: `There is no on going Jam`,
+            flags: "Ephemeral",
+        })        
+    }
+    
+    if (state.jamStage == "voting") {
+        const votingEnd = getTimeUntil(state.votingEndTime)
+        if (votingEnd == "past") {
+            interaction.reply({
+                content: `The voting has ended and the Jam will start at **${getTimeUntil(state.jamStartTime)}** the theme is **${state.currentTheme}**`,
+                flags: "Ephemeral",
+            })
+        } else {
+            interaction.reply({
+                content: `The Voting ends in ${votingEnd}`,
+                flags: "Ephemeral",
+            })
+        }
+    } 
+    if (state.jamStage == "voteEnd") {
+        const votingEnd = getTimeUntil(state.jamStartTime)
+        if (votingEnd == "past") {
+            interaction.reply({
+                content: `The the jam ends in **${getTimeUntil(state.jamEndTime)}** the theme is **${state.currentTheme}**`,
+                flags: "Ephemeral",
+            })
+        } else {
+            interaction.reply({
+                content: `The Jam starts in **${votingEnd}** the theme still has to be voted`,
+                flags: "Ephemeral",
+            })
+        }
+    } 
 }

@@ -1,7 +1,21 @@
-export const state = {
+interface JamState {
+  currentTheme: string;
+  votingEndTime: string;
+  jamStartTime: string;
+  jamEndTime: string;
+  jamPage: string;
+  jamStage: string;
+  votes: Map<string, number>;
+  uservotes: string[]
+}
+
+export const state: JamState = {
   currentTheme: "",
-  endTime: 0,
+  votingEndTime: "",
+  jamStartTime: "",
+  jamEndTime: "",
   jamPage: "",
-  votingEnd: 0,
-  votedTheme: "",
+  jamStage: "",
+  votes: new Map<string, number>(),
+  uservotes: []
 };
