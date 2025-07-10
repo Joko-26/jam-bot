@@ -8,7 +8,7 @@
 - **`/theme`**
   displayes the current theme
 - **`/addtheme`**
-  adds an new theme to the theme pool for the theme votes
+  adds a new theme to the theme pool for the theme votes
 
 ## Jam-Admin Commands
   *These commands need the role Jam-Admin*
