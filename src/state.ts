@@ -1,4 +1,4 @@
-interface JamState {
+export interface JamState {
   currentTheme: string;
   votingEndTime: string;
   jamStartTime: string;
@@ -6,10 +6,13 @@ interface JamState {
   jamPage: string;
   jamStage: string;
   votes: Map<string, number>;
-  uservotes: string[]
+  uservotes: string[];
+  themes: string[];
+  jamChannel: string;
+  jamAdminRole: string
 }
 
-export const state: JamState = {
+export const defaultJamState: JamState = {
   currentTheme: "",
   votingEndTime: "",
   jamStartTime: "",
@@ -17,5 +20,8 @@ export const state: JamState = {
   jamPage: "",
   jamStage: "",
   votes: new Map<string, number>(),
-  uservotes: []
+  uservotes: [],
+  themes:[],
+  jamChannel:"",
+  jamAdminRole: "",
 };

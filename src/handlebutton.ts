@@ -1,7 +1,8 @@
-import { ButtonInteraction } from "discord.js";
-import { state } from "./state";
+import { ButtonInteraction, EmbedBuilder } from "discord.js";
+import { getGuildState, saveGuildState } from "./stateManager"
 
 export async function handlebutton(interaction: ButtonInteraction) {
+  const state = getGuildState(String(interaction.guildId))
   const userID = interaction.user.id
   if (!interaction.deferred && !interaction.replied) {
     await interaction.deferReply({ flags: "Ephemeral" });
@@ -16,17 +17,27 @@ export async function handlebutton(interaction: ButtonInteraction) {
     state.votes.set(themeKey, currentVotes + 1);
 
     const index = interaction.customId.split("_").pop();
+    const embed = new EmbedBuilder()
+      .setTitle("You voted")
+      .setDescription(`You voted for ${index} as the next theme`)
+      .setColor(0xfbff00)
     await interaction.editReply({
-      content: `You voted for ${index} as the next theme`,
+      embeds: [embed],
     });
+    saveGuildState(String(interaction.guildId))
   } else {
+    const embed = new EmbedBuilder()
+      .setTitle("You cant vote")
+      .setDescription(`You already voted`)
+      .setColor(0xfbff00)
     await interaction.editReply({
-      content: `You already voted`,
+      embeds: [embed],
     });
   }
 }
 
-export function getWinningTheme(): string | null {
+export function getWinningTheme(guild:string): string | null {
+  const state = getGuildState(guild)
   let maxVotes = -1;
   let winner: string | null = null;
 

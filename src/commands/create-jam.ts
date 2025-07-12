@@ -7,28 +7,27 @@ import {
   ButtonStyle,
   EmbedBuilder,
 } from "discord.js";
-import { state } from "../state";
-import { timeSplitter } from "../timeSplitter"
-import { loadString } from "../saveString";
+import { timeSplitter } from "../timeManager";
+import { getGuildState, saveGuildState } from "../stateManager";
 
 export const data = new SlashCommandBuilder()
   .setName("createjam")
   .setDescription("Create a Jam")
 
-  .addStringOption((option) => 
+  .addStringOption((option) =>
     option
       .setName("votingenddate")
       .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
       .setRequired(true)
   )
-  .addStringOption((option) => 
+  .addStringOption((option) =>
     option
       .setName("jamstartdate")
       .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
       .setRequired(true)
   )
 
-  .addStringOption((option) => 
+  .addStringOption((option) =>
     option
       .setName("jamenddate")
       .setDescription("Th end date for the theme voting (DD.MM.YY HH:MM)")
@@ -40,16 +39,33 @@ export const data = new SlashCommandBuilder()
       .setName("jampage")
       .setDescription("The official page of the Jam")
       .setRequired(false)
-  )
+  );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  const requiredRoleName = "Jam-Admin";
+  const state = getGuildState(String(interaction.guildId));
+
+  if (state.jamAdminRole == "" && state.jamChannel == "") {
+    const embed = new EmbedBuilder()
+      .setTitle("Bot isnt setup proprely")
+      .setDescription("Please use `/setup` to setup the bot properly")
+      .setColor(0xff1100);
+    return interaction.reply({
+      embeds: [embed],
+      flags: "Ephemeral",
+    });
+  }
+
+  const requiredRoleName = state.jamAdminRole;
 
   const member = interaction.member as GuildMember;
-  if (!member.roles.cache.some((role) => role.name === requiredRoleName)) {
+  if (!member.roles.cache.some((role) => role.id === requiredRoleName)) {
+    const embed = new EmbedBuilder()
+      .setTitle("Invalid role")
+      .setDescription("You don't have permission to run this command.")
+      .setColor(0xff1100);
     return interaction.reply({
-      content: "You don't have permission to run this command.",
-      ephemeral: true,
+      embeds: [embed],
+      flags: "Ephemeral",
     });
   }
 
@@ -58,21 +74,28 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const jamEnd = interaction.options.getString("jamenddate", true);
   const jampage = interaction.options.getString("jampage") ?? "";
 
-  state.votingEndTime = timeSplitter(votingEnd)
-  state.jamStartTime = timeSplitter(jamStart)
-  state.jamEndTime = timeSplitter(jamEnd)
-
-  state.jamStage = "voting"
+  state.votingEndTime = timeSplitter(votingEnd);
+  state.jamStartTime = timeSplitter(jamStart);
+  state.jamEndTime = timeSplitter(jamEnd);
 
   state.jamPage = jampage;
 
-  const themes = loadString();
-  if (!themes) {
-    return interaction.reply("No themes available.");
+  const themes = state.themes;
+  if (themes.length == 0) {
+    const embed = new EmbedBuilder()
+      .setTitle("No themes available")
+      .setDescription("Please use /addtheme to add themes to the themepool")
+      .setColor(0xff1100);
+    return interaction.reply({
+      embeds: [embed],
+      flags: "Ephemeral",
+    });
   }
 
-  const themesArr = Object.values(themes);
-  const shuffled = [...themesArr].sort(() => Math.random() - 0.5);
+  state.jamStage = "voting";
+  saveGuildState(String(interaction.guildId));
+
+  const shuffled = [...themes].sort(() => Math.random() - 0.5);
   const selectedThemes = shuffled.slice(0, 3);
 
   const buttons = selectedThemes.map((theme, i) =>
@@ -80,18 +103,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setCustomId(`theme_vote_${theme}`)
       .setLabel(theme)
       .setStyle(ButtonStyle.Primary)
-
   );
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
 
   const embed = new EmbedBuilder()
     .setTitle("Vote for a Theme")
-    .setDescription(`The Vote ends at **${state.votingEndTime}**`)
-    .setColor(0x00ff88)
+    .setDescription(`## The Vote ends at **${state.votingEndTime}**`)
+    .setColor(0x001eff);
+
+  const announcementEmbed = new EmbedBuilder()
+    .setTitle("New Jam")
+    .setDescription(`@everyone A New Jam has begun the Voting starts **now**`)
+    .setColor(0x001eff);
 
   await interaction.reply({
-    embeds: [embed],
+    embeds: [announcementEmbed, embed],
     components: [row],
   });
 }

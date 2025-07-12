@@ -8,16 +8,18 @@
 - **`/theme`**
   displayes the current theme
 - **`/addtheme`**
-  adds a new theme to the theme pool for the theme votes
+  adds a new theme to the theme pool for the theme votings
 
 ## Jam-Admin Commands
-  *These commands need the role Jam-Admin*
+  *These command can only be run by someone with the role specified with /setup*
   - **`/createjam`**
   creates a new Jam (there can only be one Jam at a time)
   - **`/deletejam`**
   deletes the current Jam
   - **`/announcewinner`**
   anounces the winner
+  - **`/deletetheme`**
+  deletes a them from the theme pool for the theme votings
 
 ### The Command arguments get shown in Discord.
 
@@ -25,4 +27,4 @@
   Create a .env file at the root of the project and fill in:
 DISCORD_TOKEN=token
 DISCORD_CLIENT_ID=bot id
-DISCORD_JAM_CHANNEL_ID=channel id
+

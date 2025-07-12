@@ -5,14 +5,16 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Embed,
   EmbedBuilder,
+  StringSelectMenuBuilder,
+  Embed,
 } from "discord.js";
-import { getGuildState, saveGuildState } from "../stateManager";
+import { timeSplitter } from "../timeManager";
+import { getGuildState, saveGuildState, loadStates } from "../stateManager";
 
 export const data = new SlashCommandBuilder()
-  .setName("deletejam")
-  .setDescription("Delete the current Jam");
+  .setName("deletetheme")
+  .setDescription("Deletes one theme from the Themepool");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const state = getGuildState(String(interaction.guildId));
@@ -32,33 +34,42 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const member = interaction.member as GuildMember;
   if (!member.roles.cache.some((role) => role.id === requiredRoleName)) {
-    const embed = new EmbedBuilder()
-      .setTitle("Invalid role")
-      .setDescription("You don't have permission to run this command.")
-      .setColor(0xff1100);
     return interaction.reply({
+      content: "You don't have permission to run this command.",
+      ephemeral: true,
+    });
+  }
+
+  if (state.themes.length == 0) {
+    const embed = new EmbedBuilder()
+      .setTitle("No themes available")
+      .setDescription("Add themes with `/addthemes`")
+      .setColor(0xff1100);
+    interaction.reply({
       embeds: [embed],
       flags: "Ephemeral",
     });
   }
+  const dropdown = new StringSelectMenuBuilder().setCustomId("delete_themes");
 
-  state.currentTheme = "";
-  state.votingEndTime = "";
-  state.jamStartTime = "";
-  state.jamEndTime = "";
-  state.jamStage = "";
-  state.votes.clear();
-  state.uservotes = [];
+  const options = state.themes.map((theme) => ({
+    label: theme,
+    value: theme,
+  }));
+  dropdown.addOptions(options);
 
-  saveGuildState(String(interaction.guildId));
+  const drop = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+    dropdown
+  );
 
   const embed = new EmbedBuilder()
-    .setTitle("Jam was deled")
-    .setDescription(`The current Jam was deleted by ${interaction.user}`)
-    .setColor(0x00ff88)
-    .setTimestamp();
+    .setTitle("Delete Theme")
+    .setDescription("Choose the theme you want to delete")
+    .setColor(0xfbff00);
 
   interaction.reply({
     embeds: [embed],
+    components: [drop],
+    flags: "Ephemeral",
   });
 }
