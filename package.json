@@ -8,7 +8,8 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsup src/index.ts --minify",
-    "deploy": "tsx src/deploy-commands.ts"
+    "deploy Test": "tsx src/test-deploy-commands.ts",
+    "deploy Global": "tsx src/global-deploy-commands.ts"
   },
   "dependencies": {
     "discord.js": "^14.21.0",

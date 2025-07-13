@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import { config } from "./config";
 import { commands } from "./commands";
-import { deployCommands } from "./deploy-commands";
+import { deployCommands } from "./global-deploy-commands";
 import { handlebutton, getWinningTheme } from "./handlebutton";
 import { getGuildState, saveGuildState, loadStates } from "./stateManager"
 import { timeSplitter, getFormattedDate, getTimeUntil } from "./timeManager";
