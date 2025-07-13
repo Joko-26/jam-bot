@@ -25,6 +25,6 @@
 
 ## IMPORTANT:
   Create a .env file at the root of the project and fill in:
-DISCORD_TOKEN=token
-DISCORD_CLIENT_ID=bot id
+- DISCORD_TOKEN=token
+- DISCORD_CLIENT_ID=bot id
 
