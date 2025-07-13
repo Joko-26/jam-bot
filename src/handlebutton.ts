@@ -10,13 +10,14 @@ export async function handlebutton(interaction: ButtonInteraction) {
   if (! state.uservotes.includes(userID)){
     state.uservotes.push(userID)
 
-    const themeID = interaction.customId;
-    const themeKey = themeID;
+    const themeID = String(interaction.customId.split("_").pop());
 
-    const currentVotes = state.votes.get(themeKey) ?? 0;
-    state.votes.set(themeKey, currentVotes + 1);
+    const currentVotes = state.votes.get(themeID) ?? 0;
+    state.votes.set(themeID, currentVotes + 1);
 
     const index = interaction.customId.split("_").pop();
+
+
     const embed = new EmbedBuilder()
       .setTitle("You voted")
       .setDescription(`You voted for ${index} as the next theme`)

@@ -3,14 +3,17 @@ import {
   GatewayIntentBits,
   EmbedBuilder,
   TextChannel,
+  Events,
 } from "discord.js";
 import { config } from "./config";
 import { commands } from "./commands";
-import { deployCommands } from "./global-deploy-commands";
+import { deployCommands } from "./deploy-commands";
 import { handlebutton, getWinningTheme } from "./handlebutton";
 import { getGuildState, saveGuildState, loadStates } from "./stateManager"
 import { timeSplitter, getFormattedDate, getTimeUntil } from "./timeManager";
-import { handle_dropddown } from "./handleDropdown"
+import { handle_dropddown } from "./handleDropdown";
+import jams from "./jamStates.json"
+
 
 
 const client = new Client({
@@ -22,7 +25,9 @@ const client = new Client({
 });
 
 client.once("ready", async () => {
-  await client.application.commands.set([]);
+  for (const id in jams) {
+    deployCommands(id)
+  }
   console.log("Discord bot is ready");
 
   setInterval(async () => {
@@ -108,6 +113,10 @@ client.once("ready", async () => {
   }, 60 * 1000);
 });
 
+
+client.on(Events.GuildCreate, async (guild) => {
+  deployCommands(guild.id)
+})
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {

@@ -9,11 +9,28 @@
     "votes": {},
     "uservotes": [],
     "themes": [
-      "test",
-      "test",
-      "test"
+      "test1",
+      "test2",
+      "test3"
     ],
     "jamChannel": "1392143552011829278",
     "jamAdminRole": "1392189389416960111"
+  },
+  "1393588545033080842": {
+    "currentTheme": "",
+    "votingEndTime": "",
+    "jamStartTime": "",
+    "jamEndTime": "",
+    "jamPage": "",
+    "jamStage": "",
+    "votes": {},
+    "uservotes": [],
+    "themes": [
+      "test1",
+      "test2",
+      "test3"
+    ],
+    "jamChannel": "1393588545507168328",
+    "jamAdminRole": "1393588545033080842"
   }
 }

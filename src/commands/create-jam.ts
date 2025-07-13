@@ -116,6 +116,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .setTitle("New Jam")
     .setDescription(`@everyone A New Jam has begun the Voting starts **now**`)
     .setColor(0x001eff);
+    
 
   await interaction.reply({
     embeds: [announcementEmbed, embed],

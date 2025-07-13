@@ -10,7 +10,7 @@ type DeployCommandsProps = {
   guildId: string;
 };
 
-export async function deployCommandsTest(guildId: string) {
+export async function deployCommands(guildId: string) {
   try {
     console.log("Started refreshing application (/) commands.");
 
@@ -25,5 +25,3 @@ export async function deployCommandsTest(guildId: string) {
   }
 }
 
-console.log("deployed")
-deployCommandsTest("serverid");
