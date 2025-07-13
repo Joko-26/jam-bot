@@ -1,7 +1,7 @@
 # Discord Bot for Creating Jams with theme votings and many more features
 
 ## User Commands:
-- **`/help`
+- **`/help`**
   displayes all commands
 - **`/timeleft`**
   displayes the time left for the jam to the user using the command
