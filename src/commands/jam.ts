@@ -11,8 +11,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("shows the current Jam");
 
 export async function execute(interaction: CommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the bot has been setup if not quit and send a message to the user running the command
   if (state.jamAdminRole == "" && state.jamChannel == "") {
     const embed = new EmbedBuilder()
       .setTitle("Bot isnt setup proprely")
@@ -24,6 +26,7 @@ export async function execute(interaction: CommandInteraction) {
     });
   }
 
+  // check if the user has the permission to run this command
   if (state.jamStage == "") {
     const embed = new EmbedBuilder()
       .setTitle("Jam info")
@@ -35,6 +38,7 @@ export async function execute(interaction: CommandInteraction) {
     });
   }
 
+  // checks the current jam stage and sends a according message with the infos about the jam
   if (state.jamStage == "voting") {
     const votingEnd = getTimeUntil(state.votingEndTime);
     if (votingEnd == "past") {

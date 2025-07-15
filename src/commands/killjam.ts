@@ -15,8 +15,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("Delete the current Jam");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the bot has been setup if not quit and send a message to the user running the command
   if (state.jamAdminRole == "" && state.jamChannel == "") {
     const embed = new EmbedBuilder()
       .setTitle("Bot isnt setup proprely")
@@ -28,6 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // check if the user has the permission to run this command
   const requiredRoleName = state.jamAdminRole;
 
   const member = interaction.member as GuildMember;
@@ -42,6 +45,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // resets all jam specific data from the state
   state.currentTheme = "";
   state.votingEndTime = "";
   state.jamStartTime = "";
@@ -50,8 +54,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   state.votes.clear();
   state.uservotes = [];
 
+  // save the state
   saveGuildState(String(interaction.guildId));
 
+  // send according message
   const embed = new EmbedBuilder()
     .setTitle("Jam was deled")
     .setDescription(`The current Jam was deleted by ${interaction.user}`)

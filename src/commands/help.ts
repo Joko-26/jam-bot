@@ -14,6 +14,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Shows a list of all commands");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  // returns a list with all commands
   const embed = new EmbedBuilder()
     .setTitle("Help")
     .setDescription(

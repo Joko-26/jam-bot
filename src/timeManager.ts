@@ -1,5 +1,4 @@
 
-
 export function timeSplitter(timeString: string) {
     const split_timeString = timeString.split(" ")
     const time = split_timeString[1].split(":")
@@ -8,6 +7,7 @@ export function timeSplitter(timeString: string) {
     return stringTime
 }
 
+// formats the current time into a human readble format 
 export function getFormattedDate(): string {
   const now = new Date();
 
@@ -20,6 +20,7 @@ export function getFormattedDate(): string {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 }
 
+// get the passed timestring as a Date object
 export function getTimeasDate(timeString:string) {
     const match = timeString.match(/^(\d{2})\.(\d{2})\.(\d{2}) (\d{2}):(\d{2})$/);
     if (!match) return null;
@@ -29,6 +30,7 @@ export function getTimeasDate(timeString:string) {
     return new Date(fullYear, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
 }
 
+// gets the time until a passed date in the correct time format
 export function getTimeUntil(targetStr: string): string {
     const targetDate = getTimeasDate(targetStr);
     if (!targetDate) return "invalid time format";

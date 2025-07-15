@@ -11,8 +11,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("shows the current jam theme");
 
 export async function execute(interaction: CommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the bot has been setup if not quit and send a message to the user running the command
   if (state.jamAdminRole == "" && state.jamChannel == "") {
     const embed = new EmbedBuilder()
       .setTitle("Bot isnt setup proprely")
@@ -24,6 +26,7 @@ export async function execute(interaction: CommandInteraction) {
     });
   }
 
+  // send a message with the current theme
   const embed = new EmbedBuilder()
     .setTitle("Current Theme")
     .setDescription(`The current jam theme is ${state.currentTheme}`)

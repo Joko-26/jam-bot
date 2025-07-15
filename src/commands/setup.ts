@@ -12,7 +12,7 @@ import { getGuildState, saveGuildState } from "../stateManager";
 export const data = new SlashCommandBuilder()
   .setName("setup")
   .setDescription("Setup of the jam bot")
-
+  // input for the jam channel
   .addChannelOption((option) =>
     option
       .setName("jamchannel")
@@ -21,7 +21,7 @@ export const data = new SlashCommandBuilder()
       )
       .setRequired(true)
   )
-
+  // input for the jam admin role
   .addRoleOption((option) =>
     option
       .setName("jamadminrole")
@@ -30,8 +30,10 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the user has the permission to run this command and the bot has been setup
   const requiredRoleName = state.jamAdminRole;
 
   const member = interaction.member as GuildMember;
@@ -49,13 +51,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // if the bot hasnt been setup get the inputs and set the according values of the state
   const jamChannel = interaction.options.getChannel("jamchannel", true);
   const jamAdminRole = interaction.options.getRole("jamadminrole", true);
 
   state.jamChannel = String(jamChannel.id);
   state.jamAdminRole = String(jamAdminRole.id);
+  // save the state
   saveGuildState(String(interaction.guildId));
 
+  // send a according message to the user
   const embed = new EmbedBuilder()
     .setTitle("Setup Complete")
     .setDescription(

@@ -9,6 +9,7 @@ import * as setup from "./setup";
 import * as deletetheme from "./deletetheme";
 import * as help from "./help";
 
+// this is a index for all commads that the deploy-commads and the comand listener script uses, new commands have to be added in the same manner.
 export const commands = {
   theme,
   timeleft,

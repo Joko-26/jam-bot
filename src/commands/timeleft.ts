@@ -11,8 +11,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("Shows the time left till the end of the jam");
 
 export async function execute(interaction: CommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the bot has been setup if not quit and send a message to the user running the command
   if (state.jamAdminRole == "" && state.jamChannel == "") {
     const embed = new EmbedBuilder()
       .setTitle("Bot isnt setup proprely")
@@ -24,6 +26,7 @@ export async function execute(interaction: CommandInteraction) {
     });
   }
 
+  // check if there is a ongoing jam and send a according message
   if (state.jamStage == "") {
     interaction.reply({
       content: `There is no on going Jam`,
@@ -31,6 +34,7 @@ export async function execute(interaction: CommandInteraction) {
     });
   }
 
+  // check the jam stage and send a according message with the timeleft for the stage
   if (state.jamStage == "voting") {
     const votingEnd = getTimeUntil(state.votingEndTime);
     if (votingEnd == "past") {

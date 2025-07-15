@@ -17,8 +17,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("Deletes one theme from the Themepool");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  // get the state (data) for the current guild
   const state = getGuildState(String(interaction.guildId));
 
+  // check if the bot has been setup if not quit and send a message to the user running the command
   if (state.jamAdminRole == "" && state.jamChannel == "") {
     const embed = new EmbedBuilder()
       .setTitle("Bot isnt setup proprely")
@@ -30,6 +32,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // check if the user has the permission to run this command
   const requiredRoleName = state.jamAdminRole;
 
   const member = interaction.member as GuildMember;
@@ -40,6 +43,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // if the theme pool is empty send a according message
   if (state.themes.length == 0) {
     const embed = new EmbedBuilder()
       .setTitle("No themes available")
@@ -50,9 +54,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       flags: "Ephemeral",
     });
   }
-  const dropdown = new StringSelectMenuBuilder().setCustomId("delete_themes");
 
-  const options = state.themes.map((theme) => ({
+  // if there are themes in the pool create a drop down with all of themes in alphabetical order
+  const dropdown = new StringSelectMenuBuilder().setCustomId("delete_themes");
+  const sortedThemes = state.themes.sort()
+  const options = sortedThemes.map((theme) => ({
     label: theme,
     value: theme,
   }));
@@ -62,6 +68,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     dropdown
   );
 
+  // sends the drop down with a according message
   const embed = new EmbedBuilder()
     .setTitle("Delete Theme")
     .setDescription("Choose the theme you want to delete")
