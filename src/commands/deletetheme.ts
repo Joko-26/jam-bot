@@ -74,7 +74,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .setDescription("Choose the theme you want to delete")
     .setColor(0xfbff00);
 
-  interaction.reply({
+  return interaction.reply({
     embeds: [embed],
     components: [drop],
     flags: "Ephemeral",
